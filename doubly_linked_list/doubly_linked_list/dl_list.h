@@ -22,12 +22,12 @@ public:
 private:
     struct list_data {
         T  data;
-        T* prev = nullptr;
-        T* next = nullptr;
+        list_data* prev = nullptr;
+        list_data* next = nullptr;
     };
 
-    T* begin_;
-    T* end_;
+    list_data* begin_;
+    list_data* end_;
     size_t size_;
 };
 
@@ -50,7 +50,7 @@ void dl_list<T>::push_back(T elem) {
         return;
     }
 
-    T* new_next_elem = new list_data();
+    list_data* new_next_elem = new list_data();
 
     new_next_elem->data = elem;
     new_next_elem->prev = end_;
@@ -72,7 +72,7 @@ void dl_list<T>::push_front(T elem) {
         return;
     }
 
-    T* new_prev_elem = new list_data();
+    list_data* new_prev_elem = new list_data();
 
     new_prev_elem->data = elem;
     new_prev_elem->next = begin_;
@@ -86,7 +86,7 @@ void dl_list<T>::push_front(T elem) {
 template <typename T>
 T dl_list<T>::front() const {
     if (begin_ != nullptr) {
-        return *begin_->data;
+        return begin_->data;
     }
 
     return NULL;
@@ -95,7 +95,7 @@ T dl_list<T>::front() const {
 template <typename T>
 T dl_list<T>::back() const {
     if (end_ != nullptr) {
-        return *end_->data;
+        return end_->data;
     }
 
     return NULL;
@@ -107,11 +107,15 @@ void dl_list<T>::pop_back() {
         return;
     }
 
-
-    T* prev_elem = end_->prev;
-    if (prev_elem == begin_) {
-
+    if (end_->prev == nullptr) {
+        delete end_;
+        end_ = nullptr;
+        begin_ = nullptr;
+        size_--;
+        return;
     }
+
+    list_data* prev_elem = end_->prev;
 
     prev_elem->next = nullptr;
     delete end_;
@@ -126,6 +130,19 @@ void dl_list<T>::pop_front() {
         return;
     }
 
+    if (begin_->next == nullptr) {
+        delete begin_;
+        end_ = nullptr;
+        begin_ = nullptr;
+        size_--;
+        return;
+    }
+    
+    list_data* next_elem = begin_->next;
+
+    next_elem->prev = nullptr;
+    delete begin_;
+    begin_ = next_elem;
 
     size_--;
 }
